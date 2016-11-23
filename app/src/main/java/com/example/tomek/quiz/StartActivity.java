@@ -1,10 +1,10 @@
 package com.example.tomek.quiz;
 
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -15,7 +15,7 @@ public class StartActivity extends AppCompatActivity {
     protected EditText mName;
     @BindView(R.id.difficulty)
     protected Spinner mDifficulty;
-    private SharedPreferences mPrefs;
+    private UserPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,25 +23,32 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
         ButterKnife.bind(this);
 
-        mPrefs = getSharedPreferences("user", MODE_PRIVATE);
-        mName.setText(mPrefs.getString("username", ""));
+        mPrefs = new UserPreferences(this);
+        mName.setText(mPrefs.getUsername());
+        mDifficulty.setSelection(mPrefs.getLevel());
 
-
-        // Sprawdzanie czy w ogóle wpisane coś w pole imię
+    }
+    @OnClick(R.id.next)
+    protected void onNextClick(){
+// Sprawdzanie czy w ogóle wpisane coś w pole imię
         String name = mName.getText().toString();
         if ( name.trim().isEmpty() ){
             mName.setError("Brak nazwy gracza");
             return;
         }
-            //TODO Zapamiętanie nazwy gracza i poziom trudności
-        mPrefs.edit().putString("username", name).apply();
-            //TODO Losowani puli pytań
 
-            //TODO Otwarcie nowego ekranu
+        //Sprawdzanie czy wybrano poziom trudności
+        int selectedLevel = mDifficulty.getSelectedItemPosition();
+        if ( selectedLevel == 0 ){
+            Toast.makeText(this, "Wybierz poziom trudności", Toast.LENGTH_LONG).show();
+            return;
+        }
+        //TODO Zapamiętanie nazwy gracza i poziom trudności
+        mPrefs.setUsername(name);
+        mPrefs.setLevel(selectedLevel);
+        //TODO Losowani puli pytań
 
-    }
-    @OnClick(R.id.next)
-    protected void onNextClick(){
+        //TODO Otwarcie nowego ekranu
 
     }
 }
